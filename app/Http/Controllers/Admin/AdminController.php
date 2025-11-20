@@ -9,7 +9,6 @@ class AdminController extends Controller
 {
     public function index()
     {
-        // Возвращаем существующий шаблон admin.blade.php
         return view('admin.admin');
     }
 }

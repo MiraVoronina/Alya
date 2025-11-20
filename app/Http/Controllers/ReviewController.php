@@ -14,11 +14,10 @@ class ReviewController extends Controller
         $services = [];
         if(auth()->check()) {
             $userId = auth()->user()->ID_User;
+            // Получаем услуги, на которые записан пользователь
             $services = \DB::table('appointments')
-                ->join('services', 'appointments.Services_ID', '=', 'services.ID_Services')
-                ->join('status', 'appointments.ID_status', '=', 'status.ID_Status')
+                ->join('services', 'appointments.ID_Services', '=', 'services.ID_Services')
                 ->where('appointments.User_ID', $userId)
-                ->whereIn('status.Order_Status_Name', ['завершен', 'отменен'])
                 ->select('services.ID_Services', 'services.Title')
                 ->distinct()
                 ->get();

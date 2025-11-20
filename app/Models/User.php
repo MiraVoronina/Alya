@@ -18,4 +18,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Pet::class, 'User_ID', 'ID_User');
     }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin' || $this->ID_User_Role == 1;
+    }
 }

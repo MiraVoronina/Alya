@@ -3,35 +3,41 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RegisterRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class RegisterController extends Controller
 {
     public function showRegistrationForm()
     {
-        return view('register');
+        return view('register'); // Важно: 'register', файл лежит в resources/views/register.blade.php
     }
 
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $request->validate([
-            'login' => 'required|string|max:100|unique:users,Login',
-            'email' => 'required|email|max:100|unique:users,Avatar_url',
-            'password' => 'required|confirmed|min:6',
-        ]);
+        $avatarUrl = null;
+        if ($request->hasFile('photo')) {
+            $avatarUrl = $request->file('photo')->store('avatars', 'public');
+        }
 
         $user = User::create([
             'Login' => $request->login,
             'Avatar_url' => $request->email,
             'Password' => Hash::make($request->password),
             'role' => 'user',
-            'ID_User_Role' => 2
+            'ID_User_Role' => 2,
+            'Pets_id' => null,
         ]);
 
-        auth()->login($user);
+        if ($avatarUrl) {
+            $user->Avatar_url = $avatarUrl;
+            $user->save();
+        }
 
-        return redirect('/');
+        auth()->login($user);
+        return redirect()->route('home')->with('status', 'Регистрация успешно завершена');
     }
 }

@@ -49,47 +49,67 @@
             @auth
                 <div class="panel">
                     <h3>Оставить отзыв</h3>
-                    <form action="{{ route('reviews.store') }}" method="POST">
-                        @csrf
-                        <div class="form-group">
-                            <label for="service_id">Услуга</label>
-                            <select name="Services_ID" id="service_id" class="form-control" required>
-                                @foreach($services as $service)
-                                    <option value="{{ $service->ID_Services }}">{{ $service->Title }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                    @if($services->isEmpty())
+                        <p style="color: #666;">У вас нет завершённых записей для оставления отзыва</p>
+                    @else
+                        <form action="{{ route('reviews.store') }}" method="POST">
+                            @csrf
+                            <div class="form-group">
+                                <label for="service_id">Услуга</label>
+                                <select name="Services_ID" id="service_id" class="form-control" required>
+                                    <option value="">-- Выберите услугу --</option>
+                                    @foreach($services as $service)
+                                        <option value="{{ $service->ID_Services }}">{{ $service->Title }}</option>
+                                    @endforeach
+                                </select>
+                                @error('Services_ID')
+                                <div style="color:red;">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-                        <div class="form-group">
-                            <label for="rating">Оценка</label>
-                            <select name="Rating" id="rating" class="form-control" required>
-                                <option value="5">★★★★★</option>
-                                <option value="4">★★★★☆</option>
-                                <option value="3">★★★☆☆</option>
-                                <option value="2">★★☆☆☆</option>
-                                <option value="1">★☆☆☆☆</option>
-                            </select>
-                        </div>
+                            <div class="form-group">
+                                <label for="rating">Оценка</label>
+                                <select name="Rating" id="rating" class="form-control" required>
+                                    <option value="">-- Выберите оценку --</option>
+                                    <option value="5">★★★★★ (5 звёзд)</option>
+                                    <option value="4">★★★★☆ (4 звезды)</option>
+                                    <option value="3">★★★☆☆ (3 звезды)</option>
+                                    <option value="2">★★☆☆☆ (2 звезды)</option>
+                                    <option value="1">★☆☆☆☆ (1 звезда)</option>
+                                </select>
+                                @error('Rating')
+                                <div style="color:red;">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-                        <div class="form-group">
-                            <label for="content">Ваш отзыв</label>
-                            <textarea name="Content" id="content" class="form-control" rows="4" required></textarea>
-                        </div>
+                            <div class="form-group">
+                                <label for="content">Ваш отзыв</label>
+                                <textarea name="Content" id="content" class="form-control" rows="4" required></textarea>
+                                @error('Content')
+                                <div style="color:red;">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-                        <button type="submit" class="btn">Отправить отзыв</button>
-                    </form>
+                            <button type="submit" class="btn">Отправить отзыв</button>
+                        </form>
+                    @endif
+                </div>
+            @else
+                <div class="panel">
+                    <p><a href="{{ route('login') }}">Войдите</a>, чтобы оставить отзыв</p>
                 </div>
             @endauth
 
+            <h3 style="margin-top: 40px;">Все отзывы</h3>
             <div class="reviews">
                 @forelse($reviews as $review)
                     <div class="review">
                         <div class="review-avatar">{{ substr($review->user->Login ?? 'A', 0, 1) }}</div>
                         <div class="review-content">
                             <h4>{{ $review->user->Login ?? '—' }}</h4>
-                            <div><strong>{{ $review->service->Title ?? '' }}</strong></div>
+                            <div><strong>Услуга: {{ $review->service->Title ?? 'Не указана' }}</strong></div>
                             <div class="review-rating">
-                                @for($i=0; $i < $review->Rating; $i++)
+                                @for($i = 0; $i < $review->Rating; $i++)
                                     ★
                                 @endfor
                             </div>

@@ -30,43 +30,68 @@
         <section class="section">
             <div class="panel" style="max-width: 600px; margin: 0 auto;">
                 <h2>Регистрация</h2>
+
                 @if($errors->any())
                     <div class="alert alert-error">
                         {{ $errors->first() }}
                     </div>
                 @endif
 
-                <form action="{{ route('register.post') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('register.post') }}" method="POST" enctype="multipart/form-data" id="regform">
                     @csrf
 
                     <h3>Личные данные</h3>
                     <div class="form-group">
                         <label for="login">Имя (логин)</label>
-                        <input type="text" name="login" id="login" class="form-control" required>
+                        <input type="text" name="login" id="login" class="form-control" required minlength="4" maxlength="16" value="{{ old('login') }}">
+                        @error('login')
+                        <div class="alert" style="color:red;">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email" name="email" id="email" class="form-control" required>
+                        <input type="email" name="email" id="email" class="form-control" required value="{{ old('email') }}">
+                        @error('email')
+                        <div class="alert" style="color:red;">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group">
                         <label for="password">Пароль</label>
-                        <input type="password" name="password" id="password" class="form-control" required>
+                        <input
+                            type="password"
+                            name="password"
+                            id="password"
+                            class="form-control"
+                            required
+                            minlength="6"
+                            pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$"
+                            title="Пароль должен быть минимум 6 символов, содержать буквы и цифры">
+                        @error('password')
+                        <div class="alert" style="color:red;">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="form-group">
                         <label for="password_confirmation">Повторите пароль</label>
-                        <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" required>
+                        <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" required minlength="6">
                     </div>
                     <div class="form-group">
                         <label for="photo">Фото профиля (необязательно)</label>
                         <input type="file" name="photo" id="photo" class="form-control" accept="image/*">
+                        @error('photo')
+                        <div class="alert" style="color:red;">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="form-group">
                         <label>
-                            <input type="checkbox" name="agree" required>
+                            <input type="checkbox" name="agree" required {{ old('agree') ? 'checked' : '' }}>
                             Согласен с обработкой персональных данных
                         </label>
+                        @error('agree')
+                        <div class="alert" style="color:red;">{{ $message }}</div>
+                        @enderror
                     </div>
+
                     <button type="submit" class="btn">Зарегистрироваться</button>
                 </form>
 
@@ -108,5 +133,27 @@
         </div>
     </div>
 </footer>
+
+<script>
+    document.getElementById('regform').addEventListener('submit', function(e) {
+        let errors = [];
+        let login = document.getElementById('login').value.trim();
+        let password = document.getElementById('password').value;
+        let password_confirmation = document.getElementById('password_confirmation').value;
+        let email = document.getElementById('email').value.trim();
+        let passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+
+        if (login.length < 4 || login.length > 16) errors.push('Логин должен быть от 4 до 16 символов');
+        if (!/\S+@\S+\.\S+/.test(email)) errors.push('Введите корректный email');
+        if (!passwordPattern.test(password)) errors.push('Пароль должен содержать минимум 6 символов, буквы и цифры');
+        if (password !== password_confirmation) errors.push('Пароли не совпадают');
+        if (!document.getElementById('agree').checked) errors.push('Подтвердите согласие на обработку данных');
+
+        if (errors.length > 0) {
+            e.preventDefault();
+            alert(errors.join('\n'));
+        }
+    });
+</script>
 </body>
 </html>

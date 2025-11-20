@@ -15,22 +15,21 @@ use App\Http\Controllers\PetController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\HomeController;
 
-// Главная страница — теперь через контроллер
+// Главная страница — через контроллер
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::view('/welcome', 'welcome')->name('welcome');
 Route::view('/about', 'about')->name('about');
 Route::view('/contacts', 'contacts')->name('contacts');
 Route::view('/promotions', 'promotions')->name('promotions');
-Route::view('/profile', 'profile')->name('profile');
 Route::view('/confirm', 'confirm')->name('confirm');
 
 // Публичные услуги
 Route::get('/services', [ServiceController::class, 'showServicesPage'])->name('services');
 
-// Аутентификация
+// Регистрация и авторизация
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('/register', [RegisterController::class, 'register'])->name('register.post');
+Route::post('/register', [RegisterController::class, 'register'])->middleware('throttle:5,1')->name('register.post');
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -39,7 +38,8 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/works', [ReviewController::class, 'index'])->name('works');
 Route::post('/reviews', [ReviewController::class, 'store'])->middleware('auth')->name('reviews.store');
 
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+// Админ-панель
+Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('index');
     Route::resource('services', AdminServiceController::class);
     Route::resource('masters', MasterController::class);
