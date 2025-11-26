@@ -80,7 +80,7 @@
                             </div>
                         @else
                             <div class="alert alert-info">
-                                Укажите размер вашей собаки. <a href="{{ route('pets.create') }}">Или добавьте питомца</a>
+                                Укажите размер вашей собаки. <a href="{{ route('profile') }}">Или добавьте питомца в профиле</a>.
                             </div>
                         @endif
 
@@ -109,59 +109,59 @@
                     </script>
                 @endif
 
-                    @if ($step === 2)
-                        <div class="booking-panel">
-                            <form action="{{ route('booking.service.post') }}" method="POST" class="booking-form">
-                                @csrf
-                                <div class="panel">
-                                    <h3 style="text-align: center; margin-bottom: 20px; color: #8B6F6F;">
-                                        Выберите услуги для {{ $breed_category ?? 'Вашей собаки' }}
-                                    </h3>
+                @if ($step === 2)
+                    <div class="booking-panel">
+                        <form action="{{ route('booking.service.post') }}" method="POST" class="booking-form">
+                            @csrf
+                            <div class="panel">
+                                <h3 style="text-align: center; margin-bottom: 20px; color: #8B6F6F;">
+                                    Выберите услуги для {{ $breed_category ?? 'Вашей собаки' }}
+                                </h3>
 
-                                    <div id="totalPrice" style="margin: 15px 0; font-weight: bold; color:#663300; font-size: 16px; text-align: center;"></div>
+                                <div id="totalPrice" style="margin: 15px 0; font-weight: bold; color:#663300; font-size: 16px; text-align: center;"></div>
 
-                                    <div class="service-options" style="display: flex; flex-direction: column; gap: 10px;">
-                                        @if(!empty($services) && count($services))
-                                            @foreach($services as $service)
-                                                <label style="display: flex; align-items: center; padding: 12px; background: #9B8B7E; color: white; border-radius: 6px; cursor: pointer; margin: 0;">
-                                                    <input type="checkbox" name="services[]" value="{{ $service->ID_Services }}"
-                                                           data-price="{{ $service->Price }}"
-                                                           style="margin-right: 15px; cursor: pointer; width: 18px; height: 18px;" />
-                                                    <span style="flex: 1; font-size: 15px;">{{ $service->Title }}</span>
-                                                    <span style="font-weight: bold; margin-left: auto;">{{ number_format($service->Price, 0, '', ' ') }} ₽</span>
-                                                </label>
-                                            @endforeach
-                                        @else
-                                            <div class="alert alert-error">Нет доступных услуг для выбранной категории!</div>
-                                        @endif
-                                    </div>
-
-                                    <div class="panel-buttons" style="margin-top: 20px; display: flex; gap: 10px;">
-                                        <a href="{{ route('booking') }}" class="btn" style="flex: 1; padding: 10px; text-align: center; background: #A67C7C; color: white; border-radius: 6px; text-decoration: none;">Назад</a>
-                                        <button type="submit" class="btn" style="flex: 1; padding: 10px; background: #A67C7C; color: white; border: none; border-radius: 6px; cursor: pointer;">Далее</button>
-                                    </div>
+                                <div class="service-options" style="display: flex; flex-direction: column; gap: 10px;">
+                                    @if(!empty($services) && count($services))
+                                        @foreach($services as $service)
+                                            <label style="display: flex; align-items: center; padding: 12px; background: #9B8B7E; color: white; border-radius: 6px; cursor: pointer; margin: 0;">
+                                                <input type="checkbox" name="services[]" value="{{ $service->ID_Services }}"
+                                                       data-price="{{ $service->Price }}"
+                                                       style="margin-right: 15px; cursor: pointer; width: 18px; height: 18px;" />
+                                                <span style="flex: 1; font-size: 15px;">{{ $service->Title }}</span>
+                                                <span style="font-weight: bold; margin-left: auto;">{{ number_format($service->Price, 0, '', ' ') }} ₽</span>
+                                            </label>
+                                        @endforeach
+                                    @else
+                                        <div class="alert alert-error">Нет доступных услуг для выбранной категории!</div>
+                                    @endif
                                 </div>
-                            </form>
-                        </div>
 
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function() {
-                                function updateTotal() {
-                                    let sum = 0;
-                                    document.querySelectorAll('input[name="services[]"]:checked').forEach(function(cb){
-                                        sum += parseFloat(cb.getAttribute('data-price'));
-                                    });
-                                    document.getElementById('totalPrice').innerText = sum > 0
-                                        ? 'Итого: ' + sum.toLocaleString('ru-RU') + ' ₽'
-                                        : '';
-                                }
-                                document.querySelectorAll('input[name="services[]"]').forEach(function(cb){
-                                    cb.addEventListener('change', updateTotal);
+                                <div class="panel-buttons" style="margin-top: 20px; display: flex; gap: 10px;">
+                                    <a href="{{ route('booking') }}" class="btn" style="flex: 1; padding: 10px; text-align: center; background: #A67C7C; color: white; border-radius: 6px; text-decoration: none;">Назад</a>
+                                    <button type="submit" class="btn" style="flex: 1; padding: 10px; background: #A67C7C; color: white; border: none; border-radius: 6px; cursor: pointer;">Далее</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            function updateTotal() {
+                                let sum = 0;
+                                document.querySelectorAll('input[name="services[]"]:checked').forEach(function(cb){
+                                    sum += parseFloat(cb.getAttribute('data-price'));
                                 });
-                                updateTotal();
+                                document.getElementById('totalPrice').innerText = sum > 0
+                                    ? 'Итого: ' + sum.toLocaleString('ru-RU') + ' ₽'
+                                    : '';
+                            }
+                            document.querySelectorAll('input[name="services[]"]').forEach(function(cb){
+                                cb.addEventListener('change', updateTotal);
                             });
-                        </script>
-                    @endif
+                            updateTotal();
+                        });
+                    </script>
+                @endif
 
 
                 @if ($step === 3)

@@ -25,17 +25,12 @@ class RegisterController extends Controller
 
         $user = User::create([
             'Login' => $request->login,
-            'Avatar_url' => $request->email,
+            'Avatar_url' => $avatarUrl, // фикс
             'Password' => Hash::make($request->password),
             'role' => 'user',
             'ID_User_Role' => 2,
             'Pets_id' => null,
         ]);
-
-        if ($avatarUrl) {
-            $user->Avatar_url = $avatarUrl;
-            $user->save();
-        }
 
         auth()->login($user);
         return redirect()->route('home')->with('status', 'Регистрация успешно завершена');

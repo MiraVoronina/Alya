@@ -15,7 +15,6 @@ class AppointmentController extends Controller
         $filter_master = $request->input('filter_master');
         $filter_date = $request->input('filter_date');
 
-        // Базовый запрос с загрузкой отношений
         $query = Appointment::with([
             'user',
             'pet',
@@ -23,22 +22,32 @@ class AppointmentController extends Controller
             'appointmentServices.service'
         ]);
 
-        // Фильтр по мастеру
         if ($filter_master) {
             $query->where('ID_Master', $filter_master);
         }
-
-        // Фильтр по дате
         if ($filter_date) {
             $query->where('Date', $filter_date);
         }
 
-        // Сортировка и пагинация
         $appointments = $query->orderBy('Date', $sort)->paginate(15);
-
-        // Получи всех мастеров для выпадающего списка
         $masters = GroomingMaster::all();
 
         return view('admin.appointments.index', compact('appointments', 'sort', 'masters'));
+    }
+
+    public function setStatus(Request $request, $id)
+    {
+        $appointment = Appointment::findOrFail($id);
+
+        // Возьми значение из формы. Если ничего не пришло — не меняй!
+        $newStatus = $request->input('ID_status');
+        if (!is_null($newStatus) && $newStatus !== '') {
+            $appointment->ID_status = $newStatus;
+            $appointment->save();
+            return redirect()->back()->with('success', 'Статус заявки обновлен!');
+        } else {
+            // Нет значения — не обновляй
+            return redirect()->back()->with('error', 'Ошибка: статус не выбран!');
+        }
     }
 }

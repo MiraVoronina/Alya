@@ -16,8 +16,10 @@ class ReviewController extends Controller
             $userId = auth()->user()->ID_User;
             // Получаем услуги, на которые записан пользователь
             $services = \DB::table('appointments')
-                ->join('services', 'appointments.ID_Services', '=', 'services.ID_Services')
+                ->join('appointment_services', 'appointments.ID_Appointments', '=', 'appointment_services.ID_Appointments')
+                ->join('services', 'appointment_services.ID_Services', '=', 'services.ID_Services')
                 ->where('appointments.User_ID', $userId)
+                ->where('appointments.ID_status', 2)
                 ->select('services.ID_Services', 'services.Title')
                 ->distinct()
                 ->get();

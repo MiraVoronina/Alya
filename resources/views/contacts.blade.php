@@ -22,7 +22,11 @@
                 <a href="{{ route('contacts') }}">Контакты</a>
                 @auth
                     <a href="{{ route('profile') }}">Профиль</a>
-                    <a href="{{ route('logout') }}">Выход</a>
+                    <form action="{{ route('logout') }}" method="POST" style="display:inline;">
+                        @csrf
+                        <button type="submit" style="background:none;border:none;padding:0;color:inherit;cursor:pointer;">Выход</button>
+                    </form>
+
                 @else
                     <a href="{{ route('login') }}">Вход</a>
                 @endauth
